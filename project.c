@@ -87,7 +87,6 @@ int main(void)
 	*command = '\0';
 	*options = '\0';
 	printf(">>Welcome to My Movie<< \n");
-	printf("File Loading.....\n");
 	file_loading(list);
 	printf("You can use add, update, search, sort, save, end commands. \n");
 	signal(2, func);
