@@ -421,6 +421,37 @@ void delete(char * options)
 
 	sscanf(options, "%[amd]%*[ ]%d", arg, &num);
 
+	if (strcmp(arg, "m")) {
+		list->movie = (movie *)malloc(sizeof(movie));
+		FILE *mf = fopen("movie_log", "r");
+		if (fscanf(mf, "%d", &list->movie->serial) == num) {
+
+		}
+		else
+			printf("  No such record\n");
+		fclose(mf);
+	}
+	else if (strcmp(arg, "d")) {
+		list->director = (director *)malloc(sizeof(director));
+		FILE *df = fopen("director_log", "r");
+		if (fscanf(df, "%d", &list->director->serial) == num) {
+
+		}
+		else
+			printf("  No such record\n");
+		fclose(df);
+	}
+	else if (strcmp(arg, "a")) {
+		list->actor = (actor *)malloc(sizeof(actor));
+		FILE *af = fopen("actor_log", "r");
+		if (fscanf(af, "%d", &list->actor->serial) == num) {
+
+		}
+		else
+			printf("  No such record\n");
+		fclose(af);
+	}
+	
 	printf("arg : ==%s==\n", arg);
 	for (int i = 0; i < strlen(arg); i++)
 	{
@@ -532,7 +563,12 @@ void save(char * options)
 		printf("input options\n");
 		return;
 	}
-
+	
+FILE *mp, *dp, *ap;
+	mp = fopen("movie_list", "w");
+	dp = fopen("director_list", "w");
+	ap = fopen("actor_list", "w");
+	
 	char * arg = (char *)malloc(sizeof(char) * 4);
 	char * op = (char *)malloc(sizeof(char) * 7);
 	char * op_f = (char *)malloc(sizeof(char) * 2);
@@ -544,6 +580,45 @@ void save(char * options)
 
 	sscanf(options, "%[amd]%*[ ]%[tgdyransbm]%*[ ]-%[f]%*[ ]%[^\0]", arg, op, op_f, file_name);
 
+	if (strcmp(arg, "m")){
+		if (strcmp(op, "t")) 
+			fprintf(mp, "%s", movie->title);
+		else if (strcmp(op, "g")) 
+			fprintf(mp, "%s", movie->genre);
+		else if (strcmp(op, "d")) 
+			fprintf(mp, "%s", movie->director);
+		else if (strcmp(op, "y")) 
+			fprintf(mp, "%d", movie->year);
+		else if (strcmp(op, "r")) 
+			fprintf(mp, "%d", movie->runtime);
+		else if (strcmp(op, "a")) 
+			fprintf(mp, "%s", movie->actor);
+	}
+	fclose(mp);
+
+	else if (strcmp(arg, "d")) {
+		if (strcmp(op, "n") 
+			fprintf(dp, "%s", director->name);
+		else if (strcmp(op, "s")) 
+			fprintf(dp, "%s", director->sex);
+		else if (strcmp(op, "b")) 
+			fprintf(dp, "%d", director->birth);
+		else if (strcmp(op, "m")) 
+			fprintf(dp, "%s", director->movie);
+	}
+	fclose(dp);
+
+	else if (strcmp(arg, "a")) {
+		if (strcmp(op, "n")) 
+			fprintf(ap, "%s", actor->name);
+		else if (strcmp(op, "s"))
+			fprintf(ap, "%s", actor->sex);
+		else if (strcmp(op, "b"))
+			fprintf(ap, "%d", actor->birth);
+		else if (strcmp(op, "m"))
+			fprintf(ap, "%s", actor->movie);
+	}
+	fclose(ap);
 	printf("arg : ==%s==\n", arg);
 	for (int i = 0; i < strlen(arg); i++)
 	{
@@ -561,6 +636,7 @@ void save(char * options)
 	printf("strlen(op_f)+1 : %d\n", strlen(op_f) + 1);
 	printf("strlen(file_name)+1 : %d\n", strlen(file_name) + 1);
 
+	
 	if (!strcmp(arg, ""))
 	{
 		printf("input arg\n");
