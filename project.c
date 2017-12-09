@@ -2,8 +2,33 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <stdbool.h>
 #pragma warning(disable:4996)
-
+#define EMPTY -1
+#define MAX_LEN 30
+#define FULL (MAX_LEN-1)
+typedef struct stack
+{
+        char * s;
+        int top;
+} stack;
+static stack s;
+void reset() {
+        s.top = EMPTY;
+}
+void push(char c) {
+        s.top++;
+        *(s.s + s.top) = c;
+}
+char pop(void) {
+        return *(s.s +s.top--);
+}
+bool empty(void) {
+        return (s.top == EMPTY);
+}
+bool full(void) {
+        return (s.top == FULL);
+}
 typedef struct movie {
 	int serial ;
 	int year;
@@ -18,7 +43,7 @@ typedef struct movie {
     int serial;
     char* director;
 	char* sex;
-	int birth;
+	char* birth;
     char* title;
     struct director* next;
 }director;
@@ -41,7 +66,7 @@ typedef struct movie {
  }List;
 
 void input_command(char *, char *, char *);
-void search(char *);
+void search(char *, List *);
 void print(char *,List* list);
 void add(char *,List* list);
 void update(char *);
@@ -211,51 +236,430 @@ void print(char * options,List* list) //print함수
 	free(arg);
 	printf("end print\n");
 }
-void search(char * options)//search함수
+void search(char * options, List * list)
 {
-	if (!strcmp(options, ""))
-	{
-		printf("input options\n");
-		return;
-	}
+        if (!strcmp(options, "")) // 옵션이 입력되지 않은 경우 오류처리
+        {
+                printf("input options\n");
+                return;
+        }
 
-	char * op = (char *)malloc(sizeof(char) * 4);
-	char * string = (char *)malloc(sizeof(char) * 20);
-	*op = '\0';
-	*string = '\0';
+        char * op = (char *)malloc(sizeof(char)*4);
+        char * string = (char *)malloc(sizeof(char)*MAX_LEN);
+        *op = '\0';
+        *string = '\0';
 
-	sscanf(options, "-%[amd]%*[ ]%[^\0]", op, string);
+        sscanf(options, "-%[amd]%*[ ]%[^\0]", op, string);
 
-	printf("op : ==%s==\n", op);
-	for (int i = 0; i < strlen(op); i++)
-	{
-		printf("*(op + %d) : ==%c==\n", i, *(op + i));
-	}
-	for (int i = 0; i < strlen(string); i++)
-	{
-		printf("*(string + %d) : ==%c==\n", i, *(string + i));
-	}
-	printf("strlen(op)+1 : %d\n", strlen(op) + 1);
-	printf("strlen(string)+1 : %d\n", strlen(string) + 1);
+        if (!strcmp(op, "")) //부적절한 옵션인 경우 오류처리
+        {
+                printf("input op\n");
+                free(op);
+                free(string);
+                return;
+        }
+        if (!strcmp(string, "")) //부적절한 옵션인 경우 오류처리
+        {
+                printf("input string\n");
+                free(op);
+                free(string);
+                return;
+        }
+        char * comp_str = (char *)malloc(sizeof(char)*MAX_LEN);
 
-	if (!strcmp(op, ""))
-	{
-		printf("input op\n");
-		free(op);
-		free(string);
-		return;
-	}
-	if (!strcmp(string, ""))
-	{
-		printf("input string\n");
-		free(op);
-		free(string);
-		return;
-	}
-
-	free(op);
-	free(string);
-	printf("end search\n");
+        for (int l = 0; l < strlen(op); l++)
+        {
+                if (*(op+l) == 'a')
+                {
+                        for (int i = 0; i < strlen(string); i++)
+                        {
+                                if (*(string + i) == '?') //메타문자 ?사용시 아스키코드값을 일일이 비교하여 검색
+				{
+                                        for (int j = 32; j < 127; j++)
+                                        {
+                                                while (list -> actor -> next != NULL)
+                                                {
+                                                        *(string + i) = j;
+                                                        if (!strcmp(string, list->actor->actor))
+                                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                                        if (!strcmp(string, list->actor->sex))
+                                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                                        if (!strcmp(string, list->actor->birth))
+                                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                                        if (!strcmp(string, list->actor->title))
+                                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                                }
+                                        }
+                                }
+                        }
+                        if (*(string + strlen(string)-1) == '*')//메타문자 *이 문자열 뒤에 있는 경우
+                        {
+                                sscanf(string, "%[^*]", comp_str);
+                                // strncmp 이용 리스트 전체의 내용과 comp_str 비교
+                                while (list->actor->next != NULL)
+                                {
+                                        if (!strncmp(comp_str, list->actor->actor, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        if (!strncmp(comp_str, list->actor->birth, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        if (!strncmp(comp_str, list->actor->sex, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        if (!strncmp(comp_str, list->actor->title, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        list -> actor = list->actor ->next;
+                                }
+                        }
+                        else if (*string == '*') //메타문자 *이 문자열 앞에 있는 경우
+                        {
+                                char * r_comp_str = (char *)malloc(sizeof(char)*MAX_LEN);
+                                char * r_list = (char *)malloc(sizeof(char)*MAX_LEN);
+                                s.s = (char *)malloc(sizeof(char)*MAX_LEN);
+                                reset();
+                                sscanf(string, "*%[^\0]", comp_str); //스택을 이용하여 비교할 문자열 string을 뒤집음
+                                reset();
+                                for (int i = 0; i < strlen(comp_str); i++)
+                                {
+                                        if (!full())
+                                                push(*(comp_str + i));
+                                }
+                                for (int j = 0; !empty(); j++)
+                                {
+                                        *(r_comp_str + j) = pop();
+                                }
+                                // 리스트 내용을 뒤집어 r_list 만든 후 strncmp 이용 r_list 내용과 r_comp_str 비교
+                                while (list->actor->next != NULL)
+                                {
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->actor->actor + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->actor->birth + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->actor->sex + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->actor->title + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        list -> actor = list->actor ->next;
+                                }
+                                free(r_comp_str);
+                                free(r_list);
+                        }
+                        else //메타문자가 없는 경우 그대로 검색
+                        {
+                                while (list->actor->next != NULL)
+                                {
+                                        if (!strcmp(string, list->actor->actor))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        if (!strcmp(string, list->actor->birth))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        if (!strcmp(string, list->actor->sex))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        if (!strcmp(string, list->actor->title))
+                                                printf("%d:%s:%s:%s:%s\n", list->actor->serial, list->actor->actor, list->actor->sex, list->actor->birth, list->actor->title);
+                                        list -> actor = list->actor ->next;
+                                }
+                        }
+                }
+                if (*(op+l) == 'd')
+                {
+                        for (int i = 0; i < strlen(string); i++)
+                        {
+                                if (*(string + i) == '?')
+                                {
+                                        for (int j = 32; j < 127; j++)
+                                        {
+                                                while (list -> director -> next != NULL)
+                                                {
+                                                        *(string + i) = j;
+                                                        if (!strcmp(string, list->director->director))
+                                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                                        if (!strcmp(string, list->director->sex))
+                                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                                        if (!strcmp(string, list->director->birth))
+                                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                                        if (!strcmp(string, list->director->title))
+                                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                                }
+                                        }
+                                }
+                        }
+                        if (*(string + strlen(string)-1) == '*')
+                        {
+                                sscanf(string, "%[^*]", comp_str);
+                                // strncmp 이용 리스트 전체의 내용과 comp_str 비교
+                                while (list->director->next != NULL)
+                                {
+                                        if (!strncmp(comp_str, list->director->director, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        if (!strncmp(comp_str, list->director->birth, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        if (!strncmp(comp_str, list->director->sex, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        if (!strncmp(comp_str, list->director->title, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        list -> director = list->director ->next;
+                                }
+                        }
+                        else if (*string == '*')
+                        {
+                                char * r_comp_str = (char *)malloc(sizeof(char)*MAX_LEN);
+                                char * r_list = (char *)malloc(sizeof(char)*MAX_LEN);
+                                s.s = (char *)malloc(sizeof(char)*MAX_LEN);
+                                reset();
+                                sscanf(string, "*%[^\0]", comp_str);
+                                reset();
+                                for (int i = 0; i < strlen(comp_str); i++)
+                                {
+                                        if (!full())
+                                                push(*(comp_str + i));
+                                }
+                                for (int j = 0; !empty(); j++)
+                                {
+                                        *(r_comp_str + j) = pop();
+                                }
+                                // 리스트 내용 역전해 r_list 만든 후 strncmp 이용 r_list 내용과 r_comp_str 비교
+                                while (list->actor->next != NULL)
+                                {
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->director->director + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->director->birth + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->actor->sex + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->director->title + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        list -> director = list->director ->next;
+                                }
+                                free(r_comp_str);
+                                free(r_list);
+                        }
+                        else
+                        {
+                                while (list->director->next != NULL)
+                                {
+                                        if (!strcmp(string, list->director->director))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        if (!strcmp(string, list->director->birth))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        if (!strcmp(string, list->director->sex))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        if (!strcmp(string, list->director->title))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        list -> director = list->director ->next;
+                                }
+                        }
+                }
+                if (*(op+l) == 'm')
+                {
+                        for (int i = 0; i < strlen(string); i++)
+                        {
+                                if (*(string + i) == '?')
+                                {
+                                        for (int j = 32; j < 127; j++)
+                                        {
+                                                while (list -> movie -> next != NULL)
+                                                {
+                                                        *(string + i) = j;
+                                                        if (!strcmp(string, list->movie->title))
+                                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                                        if (!strcmp(string, list->movie->genre))
+                                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                                        if (!strcmp(string, list->movie->director))
+                                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                                        if (!strcmp(string, list->movie->actor))
+                                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                                }
+                                        }
+                                }
+                        }
+                        if (*(string + strlen(string)-1) == '*')
+                        {
+                                sscanf(string, "%[^*]", comp_str);
+                                // strncmp 이용 리스트 전체의 내용과 comp_str 비교
+                                while (list->movie->next != NULL)
+                                {
+                                        if (!strncmp(comp_str, list->movie->title, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        if (!strncmp(comp_str, list->movie->genre, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        if (!strncmp(comp_str, list->movie->director, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        if (!strncmp(comp_str, list->movie->actor, sizeof(comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        list -> movie = list->movie ->next;
+                                }
+                        }
+                        else if (*string == '*')
+                        {
+                                char * r_comp_str = (char *)malloc(sizeof(char)*MAX_LEN);
+                                char * r_list = (char *)malloc(sizeof(char)*MAX_LEN);
+                                s.s = (char *)malloc(sizeof(char)*MAX_LEN);
+                                reset();
+                                sscanf(string, "*%[^\0]", comp_str);
+                                reset();
+                                for (int i = 0; i < strlen(comp_str); i++)
+                                {
+                                        if (!full())
+                                                push(*(comp_str + i));
+                                }
+                                for (int j = 0; !empty(); j++)
+                                {
+                                        *(r_comp_str + j) = pop();
+                                }
+                                // 리스트 내용 역전해 r_list 만든 후 strncmp 이용 r_list 내용과 r_comp_str 비교
+                                while (list->movie->next != NULL)
+                                {
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->movie->title + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->movie->genre + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->movie->director + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        reset();
+                                        for (int i = 0; i < strlen(comp_str); i++)
+                                        {
+                                                if (!full())
+                                                        push(*(list->movie->director + i));
+                                        }
+                                        for (int j = 0; !empty(); j++)
+                                        {
+                                                *(r_list + j) = pop();
+                                        }
+                                        if (!strncmp(r_comp_str, r_list, sizeof(r_comp_str)))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        list -> movie = list->movie ->next;
+                                }
+                                free(r_comp_str);
+                                free(r_list);
+                        }
+                        else
+                        {
+                                while (list->director->next != NULL)
+                                {
+                                        if (!strcmp(string, list->movie->title))
+                                                printf("%d:%s:%s:%s:%s\n", list->movie->serial, list->movie->title, list->movie->genre, list->movie->director, list->movie->actor);
+                                        if (!strcmp(string, list->movie->genre))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        if (!strcmp(string, list->movie->director))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        if (!strcmp(string, list->movie->actor))
+                                                printf("%d:%s:%s:%s:%s\n", list->director->serial, list->director->director, list->director->sex, list->director->birth, list->director->title);
+                                        list -> director = list->director ->next;
+                                }
+                        }
+                }
+        }
+        free(comp_str);
+        free(op);
+        free(string);
 }
 void add(char * options, List* list)//add함수
 {
