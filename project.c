@@ -35,7 +35,9 @@ typedef struct movie {
 	 movie* p;
 	 movie* movie;
 	 director* director;
+	 director* q;
 	 actor* actor;
+	 actor* r;
  }List;
 
 void input_command(char *, char *, char *);
@@ -338,20 +340,119 @@ void add(char * options, List* list)
 			fclose(fp);
 			return;
 		}
-			}
-		/*else if (!strcmp(options, "d")) {
-		list->director = (director*)malloc(sizeof(director*));
-		list->director->director = (char*)malloc(sizeof(char) * 40);
-		printf("director > ");
-		gets(list->movie->director);
-		list->director->sex = (char*)malloc(sizeof(char) * 3);
-		printf("sex > ");
-		scanf("%c",list->director->sex);
-		printf("birth > ");
-		scanf("%d", &list->director->birth);
-		//printf(" > "); title 연결리스트
-		
-	}*/
+		else if (!strcmp(options, "d")) //add d
+		{
+			 FILE* dp;
+        		 dp =fopen("direcor_list","a+w");
+	         if(list->director == NULL)
+		 {
+	         list->director = (director*)malloc(sizeof(direc    tor));
+	         list->director->director = (char*)malloc(sizeof    (char) * 40);
+	         printf("director > ");
+	         gets(list->director->director);
+ 		 fprintf(dp,"%s:",list->director->director);
+ 	         list->director->sex = (char*)malloc(sizeof(char    ) * 3);
+	         printf("sex > ");
+	         scanf("%c",list->director->sex);
+	         fprintf(dp,"%c:",list->director->sex);
+	         printf("birth > ");
+	         scanf("%d", &list->director->birth);
+	         getchar();	
+	         fprintf(dp,"%d:",list->director->birth);
+	         printf("title > ");
+ 	         scanf("%[^\n]",list->director->title);
+        	 getchar();
+ 	         fprintf(dp,"%s:",list->director->title);
+	         list->director->next = NULL;
+	         list->q = list->director;
+        	 fclose(dp);
+		 }
+	         else{
+             		list->director->next=(director*)malloc(sizeof(director));
+         	        list->director->next->director = (char*)malloc(sizeof(char)*20);
+      		        printf("director > ");
+  	                gets(list->director->next->director);
+ 	                fprintf(dp,"%s:",list->director->next->director);
+	                list->director->next->sex = (char*)malloc(sizeof(char)*5);
+	                printf("sex > ");
+     		        scanf("%c",list->director->next->sex);
+           	        getchar();
+      		        printf("%s",list->director->next->sex);
+     		        fprintf(dp,"%c:",list->director->next->sex);
+       		        printf("birth > ");
+      		        scanf("%d",&list->director->next->birth);
+      		        fprintf(dp,"%d:",list->director->next->birth);
+  	                printf("title > ");
+	                scanf("%[^\n]",list->director->next->title);
+     		        getchar();
+	                fprintf(dp,"%s:",list->director->next->title);
+    	                list->director->next->next = NULL;
+         	        list->director = list->director->next;
+             		fclose(dp);
+             		return;
+        	       }
+      		}
+
+    else if (!strcmp(options,"a")) //add a
+    {
+        FILE *ap;
+        ap=fopen("actor_list","a+w");
+    if(list->actor == NULL)
+        {
+        list->actor=(actor*)malloc(sizeof(actor));
+        list->actor->actor=(char*)malloc(sizeof(char)*20);
+        list->actor->next=(actor*)malloc(sizeof(actor));
+        printf("actor > ");
+        scanf("%[^\n]",list->actor->actor);
+        getchar();
+        fprintf(ap,"%s:",list->actor->actor);
+        printf("sex > ");
+        scanf("%c", list->actor->sex);
+        getchar();
+        fprintf(ap,"%c:",list->actor->sex);
+        printf("birth > ");
+        scanf("%d", &list->actor->birth);
+        getchar();
+        fprintf(ap,"%d:",list->actor->birth);
+        printf("title > ");
+        scanf("%[^\n]", list->actor->title);
+        getchar();
+        fprintf(ap,"%s:",list->actor->title);
+        list->actor->next = NULL;
+        list->r = list->actor;
+        }
+        else
+        {
+            list->actor->next=(actor*)malloc(sizeof(actor));
+            list->actor->next->actor=(char*)malloc(sizeof(char)*20);
+            printf("actor > ");
+            scanf("%[^\n]",list->actor->next->actor);
+            getchar();
+            fprintf(ap,"%s:",list->actor->next->actor);
+            printf("sex > ");
+            scanf("%[^\n]",list->actor->next->sex);
+            getchar();
+            fprintf(ap,"%c:",list->actor->next->sex);
+            printf("birth > ");
+        	scanf("%d",&list->actor->next->birth);
+            fprintf(ap,"%d:",list->actor->next->birth);
+            printf("title > ");
+            scanf("%[^\n]", list->actor->next->title);
+            getchar();
+            fprintf(ap,"%s:",list->actor->next->title);
+            list->actor->next->next = NULL;
+            list->actor = list->actor->next;
+            fclose(ap);
+            return;
+          }
+
+    }
+      free(arg);
+      free(list->movie);
+      printf("end add\n");
+ }
+	
+	}
 
 	free(arg);
 	printf("end add\n");
