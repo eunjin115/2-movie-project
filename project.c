@@ -79,7 +79,6 @@ void file_loading(List *);
 int main(void)
 {
 	List* list = (List*)malloc(sizeof(List));
-	file_loading(list);
 	list->movie = NULL;
 	char * input = (char *)malloc(sizeof(char) * 30);
 	char * command = (char *)malloc(sizeof(char) * 7);
@@ -89,54 +88,41 @@ int main(void)
 	*options = '\0';
 	printf(">>Welcome to My Movie<< \n");
 	printf("File Loading.....\n");
+	file_loading(list);
 	printf("You can use add, update, search, sort, save, end commands. \n");
-	printf("(movie) ");
 	signal(2, func);
 	while (1){
+		printf("(movie) ");
 		input_command(input, command, options);
 		if (!strcmp(command, "search"))
 		{
-			printf("do search\n");
 			search(options);
-			printf("(movie) ");
 		}
 		else if (!strcmp(command, "print"))
 		{
-			printf("do print\n");
 			print(options,list);
-			printf("(movie) ");
 		}
 		else if (!strcmp(command, "add"))
 		{
-			printf("do add\n");
 			add(options, list);
-			printf("(movie) ");
 			/*int a;
 			a = get_length(list);*/
 		}
 		else if (!strcmp(command, "update"))
 		{
-			printf("do update\n");
 			update(options);
-			printf("(movie) ");
 		}
 		else if (!strcmp(command, "delete"))
 		{
-			printf("do delete\n");
 			delete(options);
-			printf("(movie) ");
 		}
 		else if (!strcmp(command, "sort"))
 		{
-			printf("do sort\n");
 			sort(options);
-			printf("(movie) ");
 		}
 		else if (!strcmp(command, "save"))
 		{
-			printf("do save\n");
 			save(options);
-			printf("(movie) ");
 		}
 		else if (!strcmp(command, "end"))
 		{
@@ -176,12 +162,6 @@ void input_command(char * input, char * command, char * options)//command와opti
 	scanf("%[^\n]", input);
 	getchar();
 	sscanf(input, "%[^ ]%*[ ]%[^\0]", command, options);
-	/*printf("input : ==%s==\n", input);
-	printf("command : ==%s==\n", command);
-	printf("options : ==%s==\n", options);
-	printf("strlen(command)+1 : %d\n", strlen(command) + 1);
-	printf("strlen(options)+1 : %d\n", strlen(options) + 1);
-	*/
 }
 void print(char * options,List* list) //print함수
 {
@@ -196,15 +176,7 @@ void print(char * options,List* list) //print함수
 	*arg = '\0';
 
 	sscanf(options, "%[amd]%*[ ]%d", arg, &num);
-
-	/*printf("arg : ==%s==\n", arg);
-	for (int i = 0; i < strlen(arg); i++)
-	{
-		printf("*(arg + %d) : ==%c==\n", i, *(arg + i));
-	}
-	printf("num : %d\n", num);
-	printf("strlen(arg)+1 : %d\n", strlen(arg) + 1);
-	*/
+	
 	if (!strcmp(arg, ""))
 	{
 		printf("input arg\n");
@@ -226,12 +198,6 @@ void print(char * options,List* list) //print함수
 		printf("D : %s \n", list->p->director);
 		return;
 	}
-	/*if (num < 0)
-	{
-		printf("input num\n");
-		free(arg);
-		return;
-	}*/
 
 	free(arg);
 	printf("end print\n");
