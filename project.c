@@ -136,7 +136,7 @@ int main(void)
 	free(options);
 	return 0;
 }
-void func(int c) {
+void func(int c) { //신호처리함수
 	char a;
 	printf("Get Interrupt Signal.\n");
 	printf("Do you want to exit myMOVIE program? (Y/N)");
@@ -146,7 +146,7 @@ void func(int c) {
 	}
 	return;
 }
-void input_command(char * input, char * command, char * options)
+void input_command(char * input, char * command, char * options)//command와options구분하는함수
 {
 	scanf("%[^\n]", input);
 	getchar();
@@ -158,7 +158,7 @@ void input_command(char * input, char * command, char * options)
 	printf("strlen(options)+1 : %d\n", strlen(options) + 1);
 	*/
 }
-void print(char * options,List* list)
+void print(char * options,List* list) //print함수
 {
 	if (!strcmp(options, ""))
 	{
@@ -211,7 +211,7 @@ void print(char * options,List* list)
 	free(arg);
 	printf("end print\n");
 }
-void search(char * options)
+void search(char * options)//search함수
 {
 	if (!strcmp(options, ""))
 	{
@@ -257,7 +257,7 @@ void search(char * options)
 	free(string);
 	printf("end search\n");
 }
-void add(char * options, List* list)
+void add(char * options, List* list)//add함수
 {
 	if (!strcmp(options, ""))
 	{
@@ -268,28 +268,14 @@ void add(char * options, List* list)
 	char * arg = (char *)malloc(sizeof(char) * 4);
 	*arg = '\0';
 
-	sscanf(options, "%[amd]", arg);
+	sscanf(options, "%[amd]", arg); //옵션으로 amd중 하나를읽어들임
 
-	/*printf("arg : ==%s==\n", arg);
-	for (int i = 0; i < strlen(arg); i++)
-	{
-		printf("*(arg + %d) : ==%c==\n", i, *(arg + i));
-	}
-	printf("strlen(arg)+1 : %d\n", strlen(arg) + 1);
-
-	if (!strcmp(arg, ""))
-	{
-		printf("input op\n");
-		free(arg);
-		return;
-	}*/
 	if (!strcmp(options,"m")) {
 		FILE *fp;
 		//int i = 1;
-		fp = fopen("movie_list", "a+w");
-		if (list->movie == NULL) {
+		fp = fopen("movie_list", "a+w");//movie_list파일을 열어 정보들을 저장함
+		if (list->movie == NULL) { //NULL을포인트하는 처음의 영화구조체를 if문에서 영화에 관한 정보를받고 이후 영화구조체에 저장할정보들을else문에서입력받음
 			list->movie = (movie*)malloc(sizeof(movie));
-			//list->movie->serial = i;
 			list->movie->title = (char*)malloc(sizeof(char) * 40);
 			printf("title > ");
 			gets(list->movie->title);
@@ -310,12 +296,10 @@ void add(char * options, List* list)
 			fprintf(fp, "%d \n", list->movie->runtime);
 			list->movie->next = NULL;
 			list->p = list->movie;
-			//i++;
 			fclose(fp);
 			return;
 		}
 		else {
-			//list->movie->serial = i;
 			list->movie->next = (movie*)malloc(sizeof(movie));
 			list->movie->next->title = (char*)malloc(sizeof(char) * 40);
 			printf("title > ");
@@ -337,23 +321,22 @@ void add(char * options, List* list)
 			scanf("%d", &list->movie->next->runtime);
 			fprintf(fp, "%d \n", list->movie->next->runtime);
 			list->movie->next->next = NULL;
-			list->movie = list->movie->next;
-			//i++;
+			list->movie = list->movie->next;// 현재 영화구조체가 다음 영화구조체를 참조할 수 있게함
 			fclose(fp);
 			return;
 		}
 		else if (!strcmp(options, "d")) //add d
 		{
 			 FILE* dp;
-        		 dp =fopen("direcor_list","a+w");
+        		 dp =fopen("direcor_list","a+w");//director_list파일을 열어 감독에 관한 정보들을 입력받는다
 	         if(list->director == NULL)
 		 {
-	         list->director = (director*)malloc(sizeof(direc    tor));
-	         list->director->director = (char*)malloc(sizeof    (char) * 40);
+	         list->director = (director*)malloc(sizeof(director));
+	         list->director->director = (char*)malloc(sizeof(char) * 40);
 	         printf("director > ");
 	         gets(list->director->director);
  		 fprintf(dp,"%s:",list->director->director);
- 	         list->director->sex = (char*)malloc(sizeof(char    ) * 3);
+ 	         list->director->sex = (char*)malloc(sizeof(char) * 3);
 	         printf("sex > ");
 	         scanf("%c",list->director->sex);
 	         fprintf(dp,"%c:",list->director->sex);
@@ -370,7 +353,7 @@ void add(char * options, List* list)
         	 fclose(dp);
 		 }
 	         else{
-             		list->director->next=(director*)malloc(sizeof(director));
+             		list->director->next=(director*)malloc(sizeof(director));//현재 감독구조체가 다음 감독구조체를 참조하기 위한 동적할당
          	        list->director->next->director = (char*)malloc(sizeof(char)*20);
       		        printf("director > ");
   	                gets(list->director->next->director);
@@ -389,7 +372,7 @@ void add(char * options, List* list)
      		        getchar();
 	                fprintf(dp,"%s:",list->director->next->title);
     	                list->director->next->next = NULL;
-         	        list->director = list->director->next;
+         	        list->director = list->director->next;//현재 감독구조체가 다음 감독구조체를 참조할 수 있게함
              		fclose(dp);
              		return;
         	       }
@@ -398,7 +381,7 @@ void add(char * options, List* list)
     else if (!strcmp(options,"a")) //add a
     {
         FILE *ap;
-        ap=fopen("actor_list","a+w");
+        ap=fopen("actor_list","a+w");//actor_list파일을 열어 actor에 관한 정보를 입력받는다
     if(list->actor == NULL)
         {
         list->actor=(actor*)malloc(sizeof(actor));
@@ -443,14 +426,17 @@ void add(char * options, List* list)
             getchar();
             fprintf(ap,"%s:",list->actor->next->title);
             list->actor->next->next = NULL;
-            list->actor = list->actor->next;
+            list->actor = list->actor->next;//배우구조체가 다음의 배우구조체를 참조하게함
             fclose(ap);
             return;
           }
 
     }
       free(arg);
-      free(list->movie);
+      free(list);
+      free(movie);
+      free(actor);
+      free(director);
       printf("end add\n");
  }
 	
@@ -462,7 +448,7 @@ void add(char * options, List* list)
 void writeFile(FILE* fp) {
 
 }
-void update(char * options)
+void update(char * options)//update함수
 {
 	if (!strcmp(options, ""))
 	{
@@ -476,7 +462,7 @@ void update(char * options)
 	*arg = '\0';
 	*op = '\0';
 
-	sscanf(options, "%[amd]%*[ ]%[tgdyransbm]%*[ ]%d", arg, op, &num);
+	sscanf(options, "%[amd]%*[ ]%[tgdyransbm]%*[ ]%d", arg, op, &num);//command와option,숫자 읽어  각각 arg op num에저장함
 
 	printf("arg : ==%s==\n", arg);
 	for (int i = 0; i < strlen(arg); i++)
@@ -510,7 +496,7 @@ void update(char * options)
 	free(op);
 	printf("end update\n");
 }
-void delete(char * options)
+void delete(char * options)//delete함수
 {
 	if (!strcmp(options, ""))
 	{
@@ -579,7 +565,7 @@ void delete(char * options)
 	free(arg);
 	printf("end delete\n");
 }
-void sort(char * options)
+void sort(char * options)//sort함수
 {
 	if (!strcmp(options, ""))
 	{
@@ -659,7 +645,7 @@ void sort(char * options)
 	free(file_name);
 	printf("end sort\n");
 }
-void save(char * options)
+void save(char * options)//save함수
 {
 	if (!strcmp(options, ""))
 	{
